@@ -272,44 +272,45 @@
         if ([2, 3, 5, 7].includes(parseInt(digit))) {
           clue = `Digit 1 is prime.`;
         } else {
-          clue = `Digit 1 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
         }
       } 
       else if (i === 1) {
         if (digit % 3 === 0) {
           clue = `Digit 2 is divisible by 3.`;
         } 
-        // FIXED: Only show parity if it matches target
         else if (digit % 2 === parseInt(targetDigit) % 2) {
           clue = `Digit 2 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
         }
         else {
-          clue = `Digit 2 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
         }
       }
       else if (i === 2) {
-        clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
+        clue = `The target is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
       }
       else if (i === 3) {
-  if (i < 4 && 
-      Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 && 
-      parseInt(digit) !== parseInt(targetDigit)) {
-    clue = `Digit 4 is next to Digit 5 in sequence.`;
-  } else {
-    clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-  }
-}
+        if (i < 4 && 
+            Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 && 
+            parseInt(digit) !== parseInt(targetDigit)) {
+          clue = `Digit 4 is next to Digit 5 in sequence.`;
+        } else {
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+        }
+      }
       else if (i === 4) {
         if (digit === '0' || digit === '9') {
           clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
+        } else if (digit % 2 === parseInt(targetDigit) % 2) {
+          clue = `Digit 5 has the same parity as the target.`;
         } else {
-          clue = `Digit 5 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
         }
       }
 
-      // Priority 2: Default fallback
+      // Priority 2: Default fallback (shouldn't trigger with current logic)
       if (!clue) {
-        clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+        clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
       }
     }
     clues.push(clue);
