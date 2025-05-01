@@ -250,8 +250,8 @@ function getClues(guess) {
         clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
       }
       else if (i === 3) {
-        // Fourth digit: relationship to next digit
-        if (Math.abs(digit - guess[i+1]) === 1) {
+        // Fourth digit: fixed adjacency check
+        if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
           clue = `Digit 4 is next to Digit 5 in sequence.`;
         } else {
           clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
