@@ -219,31 +219,36 @@
 
     // ===== GAME FUNCTIONS =====
     function getClues(guess) {
-      const clues = [];
-      for (let i = 0; i < 5; i++) {
-        let clue = '';
-        const digit = guess[i];
-        const targetDigit = targetNumber[i];
+  const clues = [];
+  for (let i = 0; i < 5; i++) {
+    let clue = '';
+    const digit = guess[i];
+    const targetDigit = targetNumber[i];
 
-        if (digit === targetDigit) {
-          clue = `Digit ${i + 1} is correct!`;
-        } else {
-          if (digit < targetDigit) {
-            clue = `Digit ${i + 1} is smaller than the target digit.`;
-          } else if (digit > targetDigit) {
-            clue = `Digit ${i + 1} is larger than the target digit.`;
-          }
-          if (i === 0 && digit % 2 === 0) clue = `Digit 1 is even.`;
-          if (i === 1 && digit % 2 === 1) clue = `Digit 2 is odd.`;
-          if (i === 2 && (parseInt(digit) + parseInt(targetDigit)) % 2 === 0) clue = `Sum of digits 3 and 4 is even.`;
-          if (i === 3 && digit === 7) clue = `Digit 4 is 7.`;
-          if (i === 4 && digit !== targetDigit && digit > 5) clue = `Digit 5 is greater than 5.`;
-        }
-
-        clues.push(clue);
+    if (digit === targetDigit) {
+      clue = `Digit ${i + 1} is correct!`;
+    } else {
+      // Priority 1: Even/Odd hints (for digits 1 and 2)
+      if (i === 0) clue = `Digit 1 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
+      else if (i === 1) clue = `Digit 2 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
+      
+      // Priority 2: Other special hints
+      else if (i === 2 && (parseInt(digit) + parseInt(targetDigit)) % 2 === 0) 
+        clue = `Sum of digits 3 and 4 is even.`;
+      else if (i === 3 && digit === 7) 
+        clue = `Digit 4 is 7.`;
+      else if (i === 4 && digit !== targetDigit && digit > 5) 
+        clue = `Digit 5 is greater than 5.`;
+      
+      // Priority 3: Default smaller/larger hint
+      else {
+        clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'} than the target digit.`;
       }
-      return clues;
     }
+    clues.push(clue);
+  }
+  return clues;
+}
 
     function handleGuess() {
       if (!canPlayToday()) {
