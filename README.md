@@ -38,8 +38,32 @@ Hosted on [Render](https://render.com) with automatic GitHub deploys.
 - **Version Control**: GitHub
 
 ## 🌟 Upcoming Features
-- Multiplayer leaderboard
-- Themed skins
+
+### 🏆 Competitive Play
+- **Global Leaderboard**  
+  Backend-powered daily/weekly/all-time high scores  
+- **Friend Groups**  
+  Create private groups to compete with friends  
+- **Seed Verification**  
+  Backend validation to ensure fair daily puzzles  
+
+### 🎮 Social Features
+- **Share Button**  
+  Brag about your wins with custom messages:  
+  *"I solved today's Code Breaker in 2 guesses! Can you beat me?"*  
+- **Friend Challenges**  
+  Send custom puzzles to friends  
+
+### 🔧 Technical Improvements
+- **Account System** (Optional)  
+  Save progress across devices  
+- **API Access**  
+  For developers to build alternate interfaces  
+
+### 🎨 Quality of Life
+- **Dark Mode**  
+- **Animated Tutorial**  
+- **Sound Effects Toggle**  
 
 ## 📜 License
 MIT License - see [LICENSE](LICENSE) for details.
