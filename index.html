@@ -251,67 +251,69 @@
 
     // ===== GAME FUNCTIONS =====
     function getClues(guess) {
-      const clues = [];
-      for (let i = 0; i < 5; i++) {
-        let clue = '';
-        const digit = guess[i];
-        const targetDigit = targetNumber[i];
-        const clueElement = document.getElementById(`clue${i+1}`);
+  const clues = [];
+  for (let i = 0; i < 5; i++) {
+    let clue = '';
+    const digit = guess[i];
+    const targetDigit = targetNumber[i];
+    const clueElement = document.getElementById(`clue${i+1}`);
 
-        // Reset classes
-        clueElement.classList.remove('clue-correct', 'clue-hint');
+    // Reset classes
+    clueElement.classList.remove('clue-correct', 'clue-hint');
 
-        if (digit === targetDigit) {
-          clue = `Digit ${i + 1} is correct!`;
-          clueElement.classList.add('clue-correct');
+    if (digit === targetDigit) {
+      clue = `Digit ${i + 1} is correct!`;
+      clueElement.classList.add('clue-correct');
+    } else {
+      clueElement.classList.add('clue-hint');
+      
+      // Priority 1: Special position-based clues
+      if (i === 0) {
+        if ([2, 3, 5, 7].includes(parseInt(digit))) {
+          clue = `Digit 1 is prime.`;
         } else {
-          clueElement.classList.add('clue-hint');
-          
-          // Priority 1: Special position-based clues
-          if (i === 0) {
-            if ([2, 3, 5, 7].includes(parseInt(digit))) {
-              clue = `Digit 1 is prime.`;
-            } else {
-              clue = `Digit 1 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
-            }
-          } 
-          else if (i === 1) {
-            if (digit % 3 === 0) {
-              clue = `Digit 2 is divisible by 3.`;
-            } else {
-              clue = `Digit 2 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
-            }
-          }
-          else if (i === 2) {
-            clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
-          }
-          else if (i === 3) {
-            if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
-              clue = `Digit 4 is next to Digit 5 in sequence.`;
-            } else {
-              clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-            }
-          }
-          else if (i === 4) {
-            if (digit === '0' || digit === '9') {
-              clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
-            } else if (digit % 2 === parseInt(targetDigit) % 2) {
-              clue = `Digit 5 has the same parity as the target.`;
-            } else {
-              clue = `Digit 5 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-            }
-          }
-
-          // Priority 2: Default fallback
-          if (!clue) {
-            clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-          }
+          clue = `Digit 1 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
         }
-        clues.push(clue);
+      } 
+      else if (i === 1) {
+        if (digit % 3 === 0) {
+          clue = `Digit 2 is divisible by 3.`;
+        } 
+        // FIXED: Only show parity if it matches target
+        else if (digit % 2 === parseInt(targetDigit) % 2) {
+          clue = `Digit 2 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
+        }
+        else {
+          clue = `Digit 2 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+        }
       }
-      return clues;
-    }
+      else if (i === 2) {
+        clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
+      }
+      else if (i === 3) {
+        if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
+          clue = `Digit 4 is next to Digit 5 in sequence.`;
+        } else {
+          clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+        }
+      }
+      else if (i === 4) {
+        if (digit === '0' || digit === '9') {
+          clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
+        } else {
+          clue = `Digit 5 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+        }
+      }
 
+      // Priority 2: Default fallback
+      if (!clue) {
+        clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+      }
+    }
+    clues.push(clue);
+  }
+  return clues;
+}
     function handleGuess() {
       if (!canPlayToday()) {
         feedback.textContent = "You've already played today!";
