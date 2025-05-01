@@ -2,7 +2,7 @@
 
 A daily number-guessing game with smart hints. Guess the 5-digit code using strategic clues!
 
-[![Live Demo] https://code-breaker-game.onrender.com/
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Play_Now-green?style=for-the-badge)](https://code-breaker-game.onrender.com/)
 
 ## 🎮 How to Play
 1. Guess the daily 5-digit code
