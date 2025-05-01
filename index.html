@@ -192,7 +192,16 @@
       random = random - Math.floor(random);
       return Math.floor(random * 90000 + 10000).toString();
     }
-
+    
+   // Update the score when player wins
+  function updateScore() {
+    const score = Math.max(0, 5000 - (timer * 10 + guesses.length * 100));
+    document.getElementById('score').textContent = `Score: ${score}`;
+    
+   // Store in localStorage for leaderboard (optional)
+    localStorage.setItem('lastScore', score);
+}
+    
     // ===== PLAY RESTRICTIONS =====
     function canPlayToday() {
       const lastPlayDate = localStorage.getItem('lastPlayDate');
@@ -336,6 +345,7 @@ else if (i === 3) {
         result.classList.add('winner');
         markAsPlayed();
         stopTimer();
+        updateScore();
         
         // Confetti celebration
         const confettiScript = document.createElement('script');
