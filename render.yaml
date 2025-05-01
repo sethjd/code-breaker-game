@@ -11,3 +11,7 @@ services:
           property: connectionString
       - key: NODE_ENV
         value: production
+      - key: SERVER_PORT  # Critical addition
+        value: 10000
+    healthCheckPath: /api/health  # Recommended
+    autoDeploy: true  # Optional but useful
