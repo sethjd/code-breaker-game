@@ -38,7 +38,7 @@
 
     input {
       padding: 15px;
-      font-size: 1.8rem; /* Reduced font size by 2 pt */
+      font-size: 1.8rem;
       margin: 5px;
       width: 55px;
       box-sizing: border-box;
@@ -126,7 +126,6 @@
   </style>
 </head>
 <body>
-
   <div class="game-container">
     <h1>Code Breaker</h1>
     <p class="turn">Guess the 5-digit number!</p>
@@ -140,6 +139,7 @@
     </div>
 
     <button id="guessButton">Guess</button>
+    <button id="resetButton">Reset Game</button>
 
     <div id="feedback" class="feedback"></div>
     <div class="clue-container">
@@ -168,11 +168,35 @@
   </div>
 
   <script>
-    const targetNumber = '36428';  // This will change daily in a real implementation
+    // ===== DAILY NUMBER GENERATION =====
+    function getDailyNumber() {
+      const today = new Date();
+      const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+      let random = Math.sin(seed) * 10000;
+      random = random - Math.floor(random);
+      return Math.floor(random * 90000 + 10000).toString();
+    }
+
+    // ===== PLAY RESTRICTIONS =====
+    function canPlayToday() {
+      const lastPlayDate = localStorage.getItem('lastPlayDate');
+      const today = new Date().toDateString();
+      return lastPlayDate !== today;
+    }
+
+    function markAsPlayed() {
+      localStorage.setItem('lastPlayDate', new Date().toDateString());
+    }
+
+    // ===== GAME STATE =====
+    const targetNumber = getDailyNumber();
     let guesses = [];
     let timer = 0;
     let timerInterval;
+
+    // ===== ELEMENTS =====
     const guessButton = document.getElementById('guessButton');
+    const resetButton = document.getElementById('resetButton');
     const feedback = document.getElementById('feedback');
     const result = document.getElementById('result');
     const clue1 = document.getElementById('clue1');
@@ -183,6 +207,17 @@
     const guessHistory = document.getElementById('guessHistory');
     const timerDisplay = document.getElementById('timer');
 
+    // ===== INITIAL SETUP =====
+    document.getElementById('digit1').focus();
+
+    // Disable game if already played today
+    if (!canPlayToday()) {
+      document.querySelectorAll('input').forEach(input => input.disabled = true);
+      guessButton.disabled = true;
+      feedback.textContent = "You've already played today. Come back tomorrow!";
+    }
+
+    // ===== GAME FUNCTIONS =====
     function getClues(guess) {
       const clues = [];
       for (let i = 0; i < 5; i++) {
@@ -211,6 +246,11 @@
     }
 
     function handleGuess() {
+      if (!canPlayToday()) {
+        feedback.textContent = "You've already played today!";
+        return;
+      }
+
       const digit1 = document.getElementById('digit1').value;
       const digit2 = document.getElementById('digit2').value;
       const digit3 = document.getElementById('digit3').value;
@@ -240,6 +280,7 @@
       if (guess === targetNumber) {
         result.textContent = 'Congratulations! You guessed the number!';
         result.classList.add('winner');
+        markAsPlayed();
         stopTimer();
       } else {
         result.textContent = 'Try again!';
@@ -259,12 +300,49 @@
       clearInterval(timerInterval);
     }
 
+    function resetGame() {
+      document.querySelectorAll('input').forEach(input => {
+        input.value = '';
+        input.disabled = false;
+      });
+      guessButton.disabled = false;
+      guesses = [];
+      timer = 0;
+      timerDisplay.textContent = 'Time: 0s';
+      feedback.textContent = '';
+      result.textContent = '';
+      result.className = '';
+      clue1.textContent = 'Clue for Digit 1: ';
+      clue2.textContent = 'Clue for Digit 2: ';
+      clue3.textContent = 'Clue for Digit 3: ';
+      clue4.textContent = 'Clue for Digit 4: ';
+      clue5.textContent = 'Clue for Digit 5: ';
+      guessHistory.innerHTML = '<option disabled selected>Guess History</option>';
+      stopTimer();
+    }
+
+    // ===== EVENT LISTENERS =====
     guessButton.addEventListener('click', () => {
       if (timer === 0) startTimer();
       handleGuess();
     });
 
-  </script>
+    resetButton.addEventListener('click', resetGame);
 
+    // Auto-tab between inputs
+    document.querySelectorAll('input').forEach((input, index, inputs) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
