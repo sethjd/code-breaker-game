@@ -1,1 +1,49 @@
-# code-breaker-game
+# 🔐 Code Breaker
+
+A daily number-guessing game with smart hints. Guess the 5-digit code using strategic clues!
+
+[![Live Demo] https://code-breaker-game.onrender.com/
+
+## 🎮 How to Play
+1. Guess the daily 5-digit code
+2. Receive smart hints for each digit:
+   - **Prime numbers** (Digit 1)
+   - **Even/odd matching** (Digit 2)
+   - **High/low classification** (Digit 3)
+   - **Sequential digits** (Digits 4-5)
+3. Solve it in the fewest guesses for maximum points!
+
+## 🛠️ Features
+- 🕒 Daily changing target number (seed-based)
+- 📊 Scoring system (time + guess penalties)
+- 🏆 Persistent high scores
+- 🎉 Confetti celebration on win
+- 📱 Mobile-responsive design
+
+## 🧠 Smart Hint System
+| Digit | Possible Clues |
+|-------|----------------|
+| 1 | Prime number, Even/Odd |
+| 2 | Divisible by 3, Parity match |
+| 3 | High (5-9) or Low (0-4) |
+| 4 | Sequential with Digit 5 |
+| 5 | Extreme values (0/9), Parity match |
+
+## 🚀 Deployment
+Hosted on [Render](https://render.com) with automatic GitHub deploys.
+
+## 🔧 Technologies
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Hosting**: Render
+- **Version Control**: GitHub
+
+## 🌟 Upcoming Features
+- Multiplayer leaderboard
+- Themed skins
+
+## 📜 License
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+💡 **Pro Tip**: Play daily to improve your number-pattern recognition skills!
