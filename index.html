@@ -230,7 +230,6 @@ function getClues(guess) {
     } else {
       // Priority 1: Special position-based clues
       if (i === 0) {
-        // First digit: prime or even/odd
         if ([2, 3, 5, 7].includes(parseInt(digit))) {
           clue = `Digit 1 is prime.`;
         } else {
@@ -238,7 +237,6 @@ function getClues(guess) {
         }
       } 
       else if (i === 1) {
-        // Second digit: divisible by 3 or even/odd
         if (digit % 3 === 0) {
           clue = `Digit 2 is divisible by 3.`;
         } else {
@@ -246,23 +244,21 @@ function getClues(guess) {
         }
       }
       else if (i === 2) {
-        // Middle digit: high/low
         clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
       }
       else if (i === 3) {
-        // Fourth digit: fixed adjacency check
-        if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
+        if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 
+            && digit !== targetDigit) {
           clue = `Digit 4 is next to Digit 5 in sequence.`;
         } else {
           clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
         }
       }
       else if (i === 4) {
-        // Last digit: special cases
         if (digit === '0' || digit === '9') {
           clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
         } else if (digit % 2 === parseInt(targetDigit) % 2) {
-          clue = `Digit 5 has the same parity (even/odd) as the target.`;
+          clue = `Digit 5 has the same parity as the target.`;
         } else {
           clue = `Digit 5 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
         }
@@ -270,7 +266,7 @@ function getClues(guess) {
 
       // Priority 2: Default fallback
       if (!clue) {
-        clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'} than the target.`;
+        clue = `Digit ${i + 1} is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
       }
     }
     clues.push(clue);
