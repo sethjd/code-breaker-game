@@ -101,7 +101,6 @@
       font-size: 0.9rem;
     }
 
-    /* UPDATED GUESS HISTORY STYLES */
     select#guessHistory {
       width: 100%;
       height: 200px;
@@ -172,7 +171,8 @@
     </select>
 
     <div class="score-container">
-      <p id="score">Score: 0</p>
+      <p id="score">Score: 5000 (start)</p>
+      <p id="highScore">High Score: 0</p>
     </div>
 
     <div class="leaderboard">
@@ -192,16 +192,7 @@
       random = random - Math.floor(random);
       return Math.floor(random * 90000 + 10000).toString();
     }
-    
-   // Update the score when player wins
-  function updateScore() {
-    const score = Math.max(0, 5000 - (timer * 10 + guesses.length * 100));
-    document.getElementById('score').textContent = `Score: ${score}`;
-    
-   // Store in localStorage for leaderboard (optional)
-    localStorage.setItem('lastScore', score);
-}
-    
+
     // ===== PLAY RESTRICTIONS =====
     function canPlayToday() {
       const lastPlayDate = localStorage.getItem('lastPlayDate');
@@ -211,6 +202,21 @@
 
     function markAsPlayed() {
       localStorage.setItem('lastPlayDate', new Date().toDateString());
+    }
+
+    // ===== SCORING SYSTEM =====
+    function calculateScore() {
+      const timePenalty = timer * 10;       // -10 points per second
+      const guessPenalty = guesses.length * 100; // -100 points per guess
+      return Math.max(0, 5000 - timePenalty - guessPenalty); // Never negative
+    }
+
+    function updateHighScore(score) {
+      const highScore = localStorage.getItem('highScore') || 0;
+      if (score > highScore) {
+        localStorage.setItem('highScore', score);
+        document.getElementById('highScore').textContent = `High Score: ${score}`;
+      }
     }
 
     // ===== GAME STATE =====
@@ -234,6 +240,7 @@
 
     // ===== INITIAL SETUP =====
     document.getElementById('digit1').focus();
+    updateHighScore(0); // Initialize high score display
 
     // Disable game if already played today
     if (!canPlayToday()) {
@@ -278,15 +285,13 @@
           else if (i === 2) {
             clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
           }
-else if (i === 3) {
-  if (i < 4 && 
-      Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 && 
-      Math.abs(parseInt(digit) - parseInt(targetDigit)) > 1) {
-    clue = `Digit 4 is next to Digit 5 in sequence.`;
-  } else {
-    clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-  }
-}
+          else if (i === 3) {
+            if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
+              clue = `Digit 4 is next to Digit 5 in sequence.`;
+            } else {
+              clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+            }
+          }
           else if (i === 4) {
             if (digit === '0' || digit === '9') {
               clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
@@ -345,7 +350,11 @@ else if (i === 3) {
         result.classList.add('winner');
         markAsPlayed();
         stopTimer();
-        updateScore();
+        
+        // Calculate and display score
+        const finalScore = calculateScore();
+        document.getElementById('score').textContent = `Score: ${finalScore}`;
+        updateHighScore(finalScore);
         
         // Confetti celebration
         const confettiScript = document.createElement('script');
@@ -397,6 +406,7 @@ else if (i === 3) {
       document.querySelectorAll('.clue').forEach(el => {
         el.classList.remove('clue-correct', 'clue-hint');
       });
+      document.getElementById('score').textContent = 'Score: 5000 (start)';
       stopTimer();
     }
 
@@ -421,6 +431,13 @@ else if (i === 3) {
           inputs[index - 1].focus();
         }
       });
+    });
+
+    // Start timer on first input
+    document.getElementById('digit1').addEventListener('input', () => {
+      if (timer === 0 && document.getElementById('digit1').value.length === 1) {
+        startTimer();
+      }
     });
   </script>
 </body>
