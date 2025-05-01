@@ -291,12 +291,14 @@
         clue = `Digit 3 is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
       }
       else if (i === 3) {
-        if (i < 4 && Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1) {
-          clue = `Digit 4 is next to Digit 5 in sequence.`;
-        } else {
-          clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
-        }
-      }
+  if (i < 4 && 
+      Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 && 
+      parseInt(digit) !== parseInt(targetDigit)) {
+    clue = `Digit 4 is next to Digit 5 in sequence.`;
+  } else {
+    clue = `Digit 4 is ${digit < targetDigit ? 'smaller' : 'larger'}.`;
+  }
+}
       else if (i === 4) {
         if (digit === '0' || digit === '9') {
           clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
