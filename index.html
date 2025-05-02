@@ -181,6 +181,7 @@
       border-radius: 8px;
       width: 300px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
     }
     
     .modal-content input,
@@ -202,6 +203,21 @@
     
     .leaderboard-container li {
       margin-bottom: 5px;
+    }
+
+    /* Close button for modal */
+    #closeModal {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+    #closeModal:hover {
+      color: #000;
     }
   </style>
 </head>
@@ -268,6 +284,7 @@
   <!-- SAVE SCORE MODAL -->
   <div id="saveScoreModal" class="modal-overlay">
     <div class="modal-content">
+      <button id="closeModal">×</button>
       <h3>Save Your Score</h3>
       <div>
         <label>Username:</label>
@@ -335,6 +352,7 @@
 
     // ===== GAME STATE =====
     const targetNumber = getDailyNumber();
+    console.log("Target number for testing:", targetNumber); // For debugging
     let guesses = [];
     let timer = 0;
     let timerInterval;
@@ -357,82 +375,82 @@
     updateHighScore(0);
 
     if (!canPlayToday()) {
-      document.querySelectorAll('input').forEach(input => input.disabled = true);
+      document.querySelectorAll('.game-container input').forEach(input => input.disabled = true);
       guessButton.disabled = true;
       feedback.textContent = "You've already played today. Come back tomorrow!";
     }
 
     // ===== GAME FUNCTIONS =====
     function getClues(guess) {
-  const clues = [];
-  const correctDigits = [];
-  
-  for (let i = 0; i < 5; i++) {
-    let clue = '';
-    const digit = guess[i];
-    const targetDigit = targetNumber[i];
-    const clueElement = document.getElementById(`clue${i+1}`);
-
-    clueElement.classList.remove('clue-correct', 'clue-hint');
-
-    if (digit === targetDigit) {
-      correctDigits.push(i);
-      clue = `Digit ${i + 1} is correct!`;
-      clueElement.classList.add('clue-correct');
-    } else {
-      clueElement.classList.add('clue-hint');
+      const clues = [];
+      const correctDigits = [];
       
-      if (i === 0) {
-        // Digit 1 - prime number check
-        if ([2, 3, 5, 7].includes(parseInt(targetDigit))) {
-          clue = `Digit 1 is prime.`;
-        } else {
-          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-        }
-      } 
-      else if (i === 1) {
-        // Digit 2 - divisible by 3 or even/odd
-        if (parseInt(targetDigit) % 3 === 0) {
-          clue = `Digit 2 is divisible by 3.`;
-        } 
-        else if (parseInt(targetDigit) % 2 === 0) {
-          clue = `Digit 2 is even.`;
-        } else {
-          clue = `Digit 2 is odd.`;
-        }
-      }
-      else if (i === 2) {
-        // Digit 3 - high/low
-        clue = `The target is ${parseInt(targetDigit) > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
-      }
-      else if (i === 3) {
-        // Digit 4 - sequence check with digit 5
-        if (Math.abs(parseInt(targetDigit) - parseInt(targetNumber[4])) === 1) {
-          clue = `Digit 4 is next to Digit 5 in sequence.`;
-        } else {
-          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-        }
-      }
-      else if (i === 4) {
-        // Digit 5 - extreme or parity
-        if (targetDigit === '0' || targetDigit === '9') {
-          clue = `Digit 5 is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`;
-        } else if (parseInt(targetDigit) % 2 === 0) {
-          clue = `Digit 5 is even.`;
-        } else {
-          clue = `Digit 5 is odd.`;
-        }
-      }
+      for (let i = 0; i < 5; i++) {
+        let clue = '';
+        const digit = guess[i];
+        const targetDigit = targetNumber[i];
+        const clueElement = document.getElementById(`clue${i+1}`);
 
-      // Fallback if no clue was set (shouldn't happen with current logic)
-      if (!clue) {
-        clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+        clueElement.classList.remove('clue-correct', 'clue-hint');
+
+        if (digit === targetDigit) {
+          correctDigits.push(i);
+          clue = `Digit ${i + 1} is correct!`;
+          clueElement.classList.add('clue-correct');
+        } else {
+          clueElement.classList.add('clue-hint');
+          
+          if (i === 0) {
+            // Digit 1 - prime number check
+            if ([2, 3, 5, 7].includes(parseInt(targetDigit))) {
+              clue = `Digit 1 is prime.`;
+            } else {
+              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+            }
+          } 
+          else if (i === 1) {
+            // Digit 2 - divisible by 3 or even/odd
+            if (parseInt(targetDigit) % 3 === 0) {
+              clue = `Digit 2 is divisible by 3.`;
+            } 
+            else if (parseInt(targetDigit) % 2 === 0) {
+              clue = `Digit 2 is even.`;
+            } else {
+              clue = `Digit 2 is odd.`;
+            }
+          }
+          else if (i === 2) {
+            // Digit 3 - high/low
+            clue = `The target is ${parseInt(targetDigit) > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
+          }
+          else if (i === 3) {
+            // Digit 4 - sequence check with digit 5
+            if (Math.abs(parseInt(targetDigit) - parseInt(targetNumber[4])) === 1) {
+              clue = `Digit 4 is next to Digit 5 in sequence.`;
+            } else {
+              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+            }
+          }
+          else if (i === 4) {
+            // Digit 5 - extreme or parity
+            if (targetDigit === '0' || targetDigit === '9') {
+              clue = `Digit 5 is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`;
+            } else if (parseInt(targetDigit) % 2 === 0) {
+              clue = `Digit 5 is even.`;
+            } else {
+              clue = `Digit 5 is odd.`;
+            }
+          }
+
+          // Fallback if no clue was set (shouldn't happen with current logic)
+          if (!clue) {
+            clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+          }
+        }
+        clues.push(clue);
       }
+      return { clues, correctDigits };
     }
-    clues.push(clue);
-  }
-  return { clues, correctDigits };
-}
 
     // ===== SCORE SAVING AND LEADERBOARDS =====
     const API_BASE_URL = 'https://code-breaker-game.onrender.com'; // Replace with your Render URL
@@ -441,6 +459,15 @@
       const modal = document.getElementById('saveScoreModal');
       modal.style.display = 'flex';
       
+      // Clear previous error
+      document.getElementById('saveScoreError').textContent = '';
+      
+      // Close modal handler
+      document.getElementById('closeModal').onclick = () => {
+        modal.style.display = 'none';
+      };
+      
+      // Save score handler
       document.getElementById('saveScoreBtn').onclick = async () => {
         const username = document.getElementById('username').value.trim();
         const pin = document.getElementById('userPin').value;
@@ -464,16 +491,19 @@
             })
           });
           
-          const data = await response.json();
+          if (!response.ok) throw new Error('Server error');
           
-          if (response.ok) {
-            modal.style.display = 'none';
-            loadLeaderboards();
-          } else {
-            document.getElementById('saveScoreError').textContent = data.error || 'Error saving score';
-          }
+          const data = await response.json();
+          modal.style.display = 'none';
+          loadLeaderboards();
         } catch (err) {
-          document.getElementById('saveScoreError').textContent = 'Network error. Please try again.';
+          console.error('Score save failed:', err);
+          document.getElementById('saveScoreError').textContent = 
+            'Score could not be saved (server offline). Your score was: ' + score;
+          // Store score locally for possible later submission
+          localStorage.setItem('unsavedScore', JSON.stringify({
+            username, pin, country, score, date: new Date().toISOString()
+          }));
         }
       };
     }
@@ -492,11 +522,13 @@
         document.getElementById('weeklyLeaderboard').innerHTML = formatLeaderboard(weeklyScores);
       } catch (err) {
         console.error('Error loading leaderboards:', err);
+        document.getElementById('dailyLeaderboard').innerHTML = '<p>Could not load leaderboards</p>';
+        document.getElementById('weeklyLeaderboard').innerHTML = '<p>Could not load leaderboards</p>';
       }
     }
 
     function formatLeaderboard(scores) {
-      if (!scores.length) return '<p>No scores yet</p>';
+      if (!scores || !scores.length) return '<p>No scores yet</p>';
       
       return `
         <ol>
@@ -604,7 +636,7 @@
     }
 
     function resetGame() {
-      document.querySelectorAll('input').forEach(input => {
+      document.querySelectorAll('.game-container input').forEach(input => {
         input.value = '';
         input.disabled = false;
         input.classList.remove('correct-digit');
@@ -640,7 +672,8 @@
 
     resetButton.addEventListener('click', resetGame);
 
-    document.querySelectorAll('input').forEach((input, index, inputs) => {
+    // Only apply to game input fields (not modal inputs)
+    document.querySelectorAll('.game-container input').forEach((input, index, inputs) => {
       input.addEventListener('input', (e) => {
         if (e.target.value.length === 1 && index < inputs.length - 1) {
           inputs[index + 1].focus();
