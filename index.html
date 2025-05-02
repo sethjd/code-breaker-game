@@ -364,72 +364,75 @@
 
     // ===== GAME FUNCTIONS =====
     function getClues(guess) {
-      const clues = [];
-      const correctDigits = [];
+  const clues = [];
+  const correctDigits = [];
+  
+  for (let i = 0; i < 5; i++) {
+    let clue = '';
+    const digit = guess[i];
+    const targetDigit = targetNumber[i];
+    const clueElement = document.getElementById(`clue${i+1}`);
+
+    clueElement.classList.remove('clue-correct', 'clue-hint');
+
+    if (digit === targetDigit) {
+      correctDigits.push(i);
+      clue = `Digit ${i + 1} is correct!`;
+      clueElement.classList.add('clue-correct');
+    } else {
+      clueElement.classList.add('clue-hint');
       
-      for (let i = 0; i < 5; i++) {
-        let clue = '';
-        const digit = guess[i];
-        const targetDigit = targetNumber[i];
-        const clueElement = document.getElementById(`clue${i+1}`);
-
-        clueElement.classList.remove('clue-correct', 'clue-hint');
-
-        if (digit === targetDigit) {
-          correctDigits.push(i);
-          clue = `Digit ${i + 1} is correct!`;
-          clueElement.classList.add('clue-correct');
+      if (i === 0) {
+        // Digit 1 - prime number check
+        if ([2, 3, 5, 7].includes(parseInt(targetDigit))) {
+          clue = `Digit 1 is prime.`;
         } else {
-          clueElement.classList.add('clue-hint');
-          
-          if (i === 0) {
-            if ([2, 3, 5, 7].includes(parseInt(digit))) {
-              clue = `Digit 1 is prime.`;
-            } else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          } 
-          else if (i === 1) {
-            if (digit % 3 === 0) {
-              clue = `Digit 2 is divisible by 3.`;
-            } 
-            else if (digit % 2 === parseInt(targetDigit) % 2) {
-              clue = `Digit 2 is ${digit % 2 === 0 ? 'even' : 'odd'}.`;
-            }
-            else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          }
-          else if (i === 2) {
-            clue = `The target is ${digit > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
-          }
-          else if (i === 3) {
-            if (i < 4 && 
-                Math.abs(parseInt(digit) - parseInt(guess[i+1])) === 1 && 
-                parseInt(digit) !== parseInt(targetDigit)) {
-              clue = `Digit 4 is next to Digit 5 in sequence.`;
-            } else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          }
-          else if (i === 4) {
-            if (digit === '0' || digit === '9') {
-              clue = `Digit 5 is at the ${digit === '0' ? 'low' : 'high'} extreme.`;
-            } else if (digit % 2 === parseInt(targetDigit) % 2) {
-              clue = `Digit 5 has the same parity as the target.`;
-            } else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          }
-
-          if (!clue) {
-            clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-          }
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
         }
-        clues.push(clue);
+      } 
+      else if (i === 1) {
+        // Digit 2 - divisible by 3 or even/odd
+        if (parseInt(targetDigit) % 3 === 0) {
+          clue = `Digit 2 is divisible by 3.`;
+        } 
+        else if (parseInt(targetDigit) % 2 === 0) {
+          clue = `Digit 2 is even.`;
+        } else {
+          clue = `Digit 2 is odd.`;
+        }
       }
-      return { clues, correctDigits };
+      else if (i === 2) {
+        // Digit 3 - high/low
+        clue = `The target is ${parseInt(targetDigit) > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
+      }
+      else if (i === 3) {
+        // Digit 4 - sequence check with digit 5
+        if (Math.abs(parseInt(targetDigit) - parseInt(targetNumber[4])) === 1) {
+          clue = `Digit 4 is next to Digit 5 in sequence.`;
+        } else {
+          clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+        }
+      }
+      else if (i === 4) {
+        // Digit 5 - extreme or parity
+        if (targetDigit === '0' || targetDigit === '9') {
+          clue = `Digit 5 is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`;
+        } else if (parseInt(targetDigit) % 2 === 0) {
+          clue = `Digit 5 is even.`;
+        } else {
+          clue = `Digit 5 is odd.`;
+        }
+      }
+
+      // Fallback if no clue was set (shouldn't happen with current logic)
+      if (!clue) {
+        clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
+      }
     }
+    clues.push(clue);
+  }
+  return { clues, correctDigits };
+}
 
     // ===== SCORE SAVING AND LEADERBOARDS =====
     const API_BASE_URL = 'https://code-breaker-game.onrender.com'; // Replace with your Render URL
