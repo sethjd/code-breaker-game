@@ -15,6 +15,60 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* ==== DARK MODE STYLES ==== */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .game-container {
+      background-color: #1e1e1e;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode input {
+      background-color: #2d2d2d;
+      color: #ffffff;
+      border-color: #444;
+    }
+
+    body.dark-mode input.correct-digit {
+      background-color: #2e7d32;
+      color: #ffffff;
+    }
+
+    body.dark-mode select#guessHistory {
+      background-color: #2d2d2d;
+      color: #ffffff;
+    }
+
+    body.dark-mode .leaderboard,
+    body.dark-mode .leaderboard-container {
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .clue-correct {
+      color: #81c784;
+    }
+
+    body.dark-mode .clue-hint {
+      color: #ffb74d;
+    }
+
+    body.dark-mode .modal-content {
+      background-color: #2d2d2d;
+      color: #ffffff;
+    }
+
+    body.dark-mode #closeModal {
+      color: #aaa;
+    }
+
+    body.dark-mode #closeModal:hover {
+      color: #fff;
     }
 
     /* ==== HEADER STYLING ==== */
@@ -31,6 +85,7 @@
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s, box-shadow 0.3s;
     }
 
     /* ==== DIGIT INPUT SECTION ==== */
@@ -52,6 +107,7 @@
       text-align: center;
       -moz-appearance: textfield;
       -webkit-appearance: none;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
 
     /* Style for locked correct digits */
@@ -78,6 +134,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     button:disabled {
@@ -131,6 +188,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       text-overflow: ellipsis;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     select#guessHistory option {
@@ -182,6 +240,7 @@
       width: 300px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       position: relative;
+      transition: background-color 0.3s, color 0.3s;
     }
     
     .modal-content input,
@@ -215,13 +274,37 @@
       font-size: 1.5rem;
       cursor: pointer;
       color: #666;
+      transition: color 0.3s;
     }
     #closeModal:hover {
       color: #000;
     }
+
+    /* Dark Mode Toggle Button */
+    #darkModeToggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+
+    body.dark-mode #darkModeToggle {
+      background-color: #2e7d32;
+    }
   </style>
 </head>
 <body>
+  <!-- Dark Mode Toggle Button -->
+  <button id="darkModeToggle">🌙 Dark Mode</button>
+  
   <!-- MAIN GAME CONTAINER -->
   <div class="game-container">
     <h1>Code Breaker</h1>
@@ -315,6 +398,31 @@
   </div>
 
   <script>
+    // ===== DARK MODE TOGGLE =====
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Check for saved user preference or use system preference
+    if (localStorage.getItem('darkMode') === 'enabled' || 
+        (localStorage.getItem('darkMode') === null && prefersDarkScheme.matches)) {
+      document.body.classList.add('dark-mode');
+      darkModeToggle.textContent = '☀️ Light Mode';
+    }
+
+    // Toggle dark mode
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      
+      if (isDarkMode) {
+        darkModeToggle.textContent = '☀️ Light Mode';
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        darkModeToggle.textContent = '🌙 Dark Mode';
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    });
+
     // ===== DAILY NUMBER GENERATION =====
     function getDailyNumber() {
       const today = new Date();
