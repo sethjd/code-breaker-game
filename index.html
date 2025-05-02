@@ -299,11 +299,83 @@
     body.dark-mode #darkModeToggle {
       background-color: #2e7d32;
     }
+
+    /* Help Button Styles */
+    #helpButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 36px;
+      height: 36px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+
+    #helpButton:hover {
+      transform: scale(1.1);
+      background-color: #3e8e41;
+    }
+
+    /* Help Modal Styles */
+    #helpModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1001;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .help-content {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    body.dark-mode .help-content {
+      background: #2d2d2d;
+      color: #e0e0e0;
+    }
+
+    #closeHelp {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+
+    body.dark-mode #closeHelp {
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
   <!-- Dark Mode Toggle Button -->
   <button id="darkModeToggle">🌙 Dark Mode</button>
+  
+  <!-- Help Button -->
+  <button id="helpButton" title="How to Play">?</button>
   
   <!-- MAIN GAME CONTAINER -->
   <div class="game-container">
@@ -397,6 +469,48 @@
     </div>
   </div>
 
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal-overlay">
+    <div class="help-content">
+      <button id="closeHelp">×</button>
+      <h2>How to Play Code Breaker</h2>
+      
+      <h3>Game Objective</h3>
+      <p>Guess the secret 5-digit number in as few attempts as possible!</p>
+      
+      <h3>How to Play</h3>
+      <ul>
+        <li>Enter a 5-digit number in the input fields</li>
+        <li>Click "Guess" to submit your attempt</li>
+        <li>After each guess, you'll receive clues about each digit</li>
+        <li>Correct digits will be locked in place</li>
+        <li>Use the clues to refine your next guess</li>
+      </ul>
+      
+      <h3>Scoring System</h3>
+      <ul>
+        <li>Starting score: 5000 points</li>
+        <li>-100 points for each guess</li>
+        <li>-10 points for each second taken</li>
+        <li>Higher scores are better!</li>
+      </ul>
+      
+      <h3>Clue Types</h3>
+      <ul>
+        <li><span class="clue-correct">Green</span>: Digit is correct</li>
+        <li><span class="clue-hint">Orange</span>: Hints about the digit</li>
+      </ul>
+      
+      <h3>Pro Tips</h3>
+      <ul>
+        <li>Start with numbers that help eliminate possibilities (like 12345)</li>
+        <li>Pay attention to digit-specific clues</li>
+        <li>Use process of elimination for faster solving</li>
+        <li>Try to solve it in under 5 guesses for maximum points!</li>
+      </ul>
+    </div>
+  </div>
+
   <script>
     // ===== DARK MODE TOGGLE =====
     const darkModeToggle = document.getElementById('darkModeToggle');
@@ -420,6 +534,26 @@
       } else {
         darkModeToggle.textContent = '🌙 Dark Mode';
         localStorage.setItem('darkMode', 'disabled');
+      }
+    });
+
+    // ===== HELP BUTTON FUNCTIONALITY =====
+    const helpButton = document.getElementById('helpButton');
+    const helpModal = document.getElementById('helpModal');
+    const closeHelp = document.getElementById('closeHelp');
+
+    helpButton.addEventListener('click', () => {
+      helpModal.style.display = 'flex';
+    });
+
+    closeHelp.addEventListener('click', () => {
+      helpModal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside content
+    helpModal.addEventListener('click', (e) => {
+      if (e.target === helpModal) {
+        helpModal.style.display = 'none';
       }
     });
 
