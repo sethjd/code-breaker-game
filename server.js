@@ -9,9 +9,9 @@ app.use(express.json());
 
 // PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Render provides this automatically
+  connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false // Required for Render PostgreSQL
+    rejectUnauthorized: false
   }
 });
 
@@ -56,7 +56,7 @@ app.get('/api/scores/daily', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE DATE(date) = CURRENT_DATE 
+       WHERE date::date = CURRENT_DATE
        ORDER BY score DESC 
        LIMIT 10`
     );
