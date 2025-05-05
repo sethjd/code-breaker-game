@@ -56,7 +56,7 @@ app.get('/api/scores/daily', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE date >= CURRENT_DATE 
+       WHERE DATE(date) = CURRENT_DATE 
        ORDER BY score DESC 
        LIMIT 10`
     );
