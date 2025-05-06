@@ -54,27 +54,26 @@ app.post('/api/scores', async (req, res) => {
 
 app.get('/api/scores/daily', async (req, res) => {
   try {
-    // Debug: Check what the database thinks is "today"
-    const dateCheck = await pool.query('SELECT CURRENT_DATE as today, NOW() as now');
-    console.log('Database current date:', dateCheck.rows[0].today);
-    console.log('Database current time:', dateCheck.rows[0].now);
+    // Get the client's local date (from frontend)
+    const clientDate = req.query.date; // Expects "YYYY-MM-DD" format
+    
+    if (!clientDate || !/^\d{4}-\d{2}-\d{2}$/.test(clientDate)) {
+      return res.status(400).json({ error: 'Missing or invalid date (use YYYY-MM-DD)' });
+    }
 
-    // Get scores from exactly today (midnight to midnight)
+    // Convert client date to Oregon (US West) timezone for DB comparison
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE date >= date_trunc('day', NOW()) 
-         AND date < date_trunc('day', NOW() + INTERVAL '1 day')
+       WHERE date >= $1::timestamp AT TIME ZONE 'Australia/Sydney' AT TIME ZONE 'US/Pacific'
+         AND date < ($1::timestamp + INTERVAL '1 day') AT TIME ZONE 'Australia/Sydney' AT TIME ZONE 'US/Pacific'
        ORDER BY score DESC 
-       LIMIT 10`
+       LIMIT 10`,
+      [clientDate]
     );
-
-    // Debug: Check what dates were actually returned
-    console.log('Returned scores with dates:',
-      result.rows.map(r => `${r.username}: ${r.score} ${r.date.toISOString()}`));
 
     res.json(result.rows);
   } catch (err) {
-    console.error('Daily scores error:', err);
+    console.error('Error in daily scores:', err);
     res.status(500).json({ error: 'Failed to fetch scores' });
   }
 });
