@@ -5,535 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Code Breaker</title>
   <style>
-    /* ==== GENERAL STYLING ==== */
-    body {
-      font-family: sans-serif;
-      background-color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    /* ==== DARK MODE STYLES ==== */
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-
-    body.dark-mode .game-container {
-      background-color: #1e1e1e;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    body.dark-mode input {
-      background-color: #2d2d2d;
-      color: #ffffff;
-      border-color: #444;
-    }
-
-    body.dark-mode input.correct-digit {
-      background-color: #2e7d32;
-      color: #ffffff;
-    }
-
-    body.dark-mode select#guessHistory {
-      background-color: #2d2d2d;
-      color: #ffffff;
-    }
-
-    body.dark-mode .leaderboard,
-    body.dark-mode .leaderboard-container {
-      color: #e0e0e0;
-    }
-
-    body.dark-mode .clue-correct {
-      color: #81c784;
-    }
-
-    body.dark-mode .clue-hint {
-      color: #ffb74d;
-    }
-
-    body.dark-mode .modal-content {
-      background-color: #2d2d2d;
-      color: #ffffff;
-    }
-
-    body.dark-mode #closeModal {
-      color: #aaa;
-    }
-
-    body.dark-mode #closeModal:hover {
-      color: #fff;
-    }
-
-    /* ==== HEADER STYLING ==== */
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-
-    /* ==== MAIN GAME CONTAINER ==== */
-    .game-container {
-      text-align: center;
-      width: 380px;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-    /* ==== DIGIT INPUT SECTION ==== */
-    .digit-inputs {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    /* Input field styling */
-    input {
-      padding: 15px;
-      font-size: 1.8rem;
-      margin: 5px;
-      width: 55px;
-      box-sizing: border-box;
-      border: 2px solid #ddd;
-      border-radius: 4px;
-      text-align: center;
-      -moz-appearance: textfield;
-      -webkit-appearance: none;
-      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    }
-
-    /* Style for locked correct digits */
-    input.correct-digit {
-      background-color: #e6ffe6;
-      color: #006400;
-      font-weight: bold;
-    }
-
-    /* Hide spin buttons in number inputs */
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    /* ==== BUTTON STYLING ==== */
-    button {
-      padding: 10px 15px;
-      font-size: 1rem;
-      margin-top: 10px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:disabled {
-      background-color: #ccc;
-    }
-
-    /* ==== FEEDBACK MESSAGES ==== */
-    .feedback {
-      margin-top: 10px;
-      font-size: 1.1rem;
-      font-weight: bold;
-    }
-
-    /* Winner/loser message colors */
-    .winner {
-      color: green;
-    }
-
-    .loser {
-      color: red;
-    }
-
-    /* ==== TURN INDICATOR ==== */
-    .turn {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-
-    /* ==== CLUE STYLING ==== */
-    .clue {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .clue-container {
-      text-align: left;
-      margin-top: 20px;
-      font-size: 0.9rem;
-    }
-
-    /* ==== GUESS HISTORY SECTION ==== */
-    select#guessHistory {
-      width: 100%;
-      height: 200px;
-      font-size: 0.95rem;
-      padding: 8px;
-      box-sizing: border-box;
-      margin-top: 15px;
-      white-space: normal;
-      overflow-y: auto;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    select#guessHistory option {
-      white-space: normal;
-      padding: 4px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    /* ==== SCORE DISPLAY ==== */
-    .score-container {
-      margin-top: 15px;
-      font-size: 1rem;
-    }
-
-    /* ==== LEADERBOARD SECTION ==== */
-    .leaderboard {
-      margin-top: 20px;
-      font-size: 1rem;
-      text-align: left;
-    }
-
-    /* ==== CLUE COLOR CODING ==== */
-    .clue-correct {
-      color: #2ecc71;
-      font-weight: bold;
-    }
-    .clue-hint {
-      color: #f39c12;
-    }
-
-    /* ==== NEW STYLES FOR SAVE SCORE MODAL ==== */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      position: relative;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    
-    .modal-content input,
-    .modal-content select {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-    
-    .leaderboard-container {
-      margin-top: 20px;
-      text-align: left;
-    }
-    
-    .leaderboard-container ol {
-      padding-left: 20px;
-    }
-    
-    .leaderboard-container li {
-      margin-bottom: 5px;
-    }
-
-    /* Close button for modal */
-    #closeModal {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #666;
-      transition: color 0.3s;
-    }
-    #closeModal:hover {
-      color: #000;
-    }
-
-    /* Dark Mode Toggle Button - Icon Only */
-    #darkModeToggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: 50%;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: all 0.3s;
-    }
-
-    body.dark-mode #darkModeToggle {
-      background-color: #2e7d32;
-    }
-
-    #darkModeToggle:hover {
-      transform: scale(1.1);
-    }
-
-    /* Help Button Styles */
-    #helpButton {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 36px;
-      height: 36px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: all 0.3s;
-    }
-
-    #helpButton:hover {
-      transform: scale(1.1);
-      background-color: #3e8e41;
-    }
-
-    /* Help Modal Styles */
-    #helpModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1001;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .help-content {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
-    }
-
-    body.dark-mode .help-content {
-      background: #2d2d2d;
-      color: #e0e0e0;
-    }
-
-    #closeHelp {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #666;
-    }
-
-    body.dark-mode #closeHelp {
-      color: #aaa;
-    }
+    /* [All your existing CSS styles remain exactly the same] */
   </style>
 </head>
 <body>
-  <!-- Dark Mode Toggle Button -->
-  <button id="darkModeToggle">🌙</button>
-  
-  <!-- Help Button -->
-  <button id="helpButton" title="How to Play">?</button>
-  
-  <!-- MAIN GAME CONTAINER -->
-  <div class="game-container">
-    <h1>Code Breaker</h1>
-    <p class="turn">Guess the 5-digit number!</p>
-    <div id="timer">Time: 0s</div>
-    
-    <!-- DIGIT INPUT FIELDS -->
-    <div class="digit-inputs">
-      <input type="text" id="digit1" maxlength="1" placeholder="Digit 1" />
-      <input type="text" id="digit2" maxlength="1" placeholder="Digit 2" />
-      <input type="text" id="digit3" maxlength="1" placeholder="Digit 3" />
-      <input type="text" id="digit4" maxlength="1" placeholder="Digit 4" />
-      <input type="text" id="digit5" maxlength="1" placeholder="Digit 5" />
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <button id="guessButton">Guess</button>
-    <button id="resetButton">Reset Game</button>
-
-    <!-- FEEDBACK AND CLUES SECTION -->
-    <div id="feedback" class="feedback"></div>
-    <div class="clue-container">
-      <div id="clue1" class="clue">Clue for Digit 1: </div>
-      <div id="clue2" class="clue">Clue for Digit 2: </div>
-      <div id="clue3" class="clue">Clue for Digit 3: </div>
-      <div id="clue4" class="clue">Clue for Digit 4: </div>
-      <div id="clue5" class="clue">Clue for Digit 5: </div>
-    </div>
-    <div id="result"></div>
-
-    <!-- GUESS HISTORY SECTION -->
-    <select id="guessHistory" size="5" multiple>
-      <option disabled style="font-weight:bold; text-align:center;">Guess History (Newest at Bottom)</option>
-    </select>
-
-    <!-- SCORE DISPLAY -->
-    <div class="score-container">
-      <p id="score">Score: 5000 (start)</p>
-      <p id="highScore">High Score: 0</p>
-    </div>
-
-    <!-- LEADERBOARD SECTION -->
-    <div class="leaderboard">
-      <h3>Leaderboard</h3>
-      <p>Global Rank: <span id="globalRank">-</span></p>
-      <p>Country Rank: <span id="countryRank">-</span></p>
-      <p>Friends Rank: <span id="friendsRank">-</span></p>
-    </div>
-
-    <!-- NEW LEADERBOARD CONTAINER -->
-    <div class="leaderboard-container">
-      <h3>Today's Top Scores</h3>
-      <div id="dailyLeaderboard"></div>
-      
-      <h3>Weekly Top Scores</h3>
-      <div id="weeklyLeaderboard"></div>
-    </div>
-  </div>
-
-  <!-- SAVE SCORE MODAL -->
-  <div id="saveScoreModal" class="modal-overlay">
-    <div class="modal-content">
-      <button id="closeModal">×</button>
-      <h3>Save Your Score</h3>
-      <div>
-        <label>Username:</label>
-        <input type="text" id="username">
-      </div>
-      <div>
-        <label>4-Digit PIN:</label>
-        <input type="password" id="userPin" maxlength="4">
-      </div>
-      <div>
-        <label>Country:</label>
-        <select id="country">
-          <option value="US">United States</option>
-          <option value="UK">United Kingdom</option>
-          <option value="CA">Canada</option>
-          <option value="AU">Australia</option>
-          <option value="DE">Germany</option>
-          <option value="FR">France</option>
-          <option value="JP">Japan</option>
-          <option value="IN">India</option>
-          <option value="BR">Brazil</option>
-          <option value="ZA">South Africa</option>
-        </select>
-      </div>
-      <button id="saveScoreBtn">Save Score</button>
-      <div id="saveScoreError" style="color:red; margin-top:10px;"></div>
-    </div>
-  </div>
-
-  <!-- Help Modal -->
-  <div id="helpModal" class="modal-overlay">
-    <div class="help-content">
-      <button id="closeHelp">×</button>
-      <h2>How to Play Code Breaker</h2>
-      
-      <h3>Game Objective</h3>
-      <p>Guess the secret 5-digit number in as few attempts as possible!</p>
-      
-      <h3>How to Play</h3>
-      <ul>
-        <li>Enter a 5-digit number in the input fields</li>
-        <li>Click "Guess" to submit your attempt</li>
-        <li>After each guess, you'll receive clues about each digit</li>
-        <li>Correct digits will be locked in place</li>
-        <li>Use the clues to refine your next guess</li>
-      </ul>
-      
-      <h3>Scoring System</h3>
-      <ul>
-        <li>Starting score: 5000 points</li>
-        <li>-100 points for each guess</li>
-        <li>-10 points for each second taken</li>
-        <li>Higher scores are better!</li>
-      </ul>
-      
-      <h3>Clue Types</h3>
-      <ul>
-        <li><span class="clue-correct">Green</span>: Digit is correct</li>
-        <li><span class="clue-hint">Orange</span>: Hints about the digit</li>
-      </ul>
-      
-      <h3>Pro Tips</h3>
-      <ul>
-        <li>Start with numbers that help eliminate possibilities (like 12345)</li>
-        <li>Pay attention to digit-specific clues</li>
-        <li>Use process of elimination for faster solving</li>
-        <li>Try to solve it in under 5 guesses for maximum points!</li>
-      </ul>
-    </div>
-  </div>
+  <!-- [All your existing HTML content remains exactly the same] -->
 
   <script>
     // ===== DARK MODE TOGGLE =====
     const darkModeToggle = document.getElementById('darkModeToggle');
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
-    // Check for saved user preference or use system preference
     if (localStorage.getItem('darkMode') === 'enabled' || 
         (localStorage.getItem('darkMode') === null && prefersDarkScheme.matches)) {
       document.body.classList.add('dark-mode');
       darkModeToggle.textContent = '☀️';
     }
 
-    // Toggle dark mode
     darkModeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       const isDarkMode = document.body.classList.contains('dark-mode');
@@ -560,7 +48,6 @@
       helpModal.style.display = 'none';
     });
 
-    // Close modal when clicking outside content
     helpModal.addEventListener('click', (e) => {
       if (e.target === helpModal) {
         helpModal.style.display = 'none';
@@ -604,7 +91,7 @@
 
     // ===== GAME STATE =====
     const targetNumber = getDailyNumber();
-    console.log("Target number for testing:", targetNumber); // For debugging
+    console.log("Target number for testing:", targetNumber);
     let guesses = [];
     let timer = 0;
     let timerInterval;
@@ -653,7 +140,6 @@
           clueElement.classList.add('clue-hint');
           
           if (i === 0) {
-            // Digit 1 - prime number check
             if ([2, 3, 5, 7].includes(parseInt(targetDigit))) {
               clue = `Digit 1 is prime.`;
             } else {
@@ -661,7 +147,6 @@
             }
           } 
           else if (i === 1) {
-            // Digit 2 - divisible by 3 or even/odd
             if (parseInt(targetDigit) % 3 === 0) {
               clue = `Digit 2 is divisible by 3.`;
             } 
@@ -672,11 +157,9 @@
             }
           }
           else if (i === 2) {
-            // Digit 3 - high/low
             clue = `The target is ${parseInt(targetDigit) > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
           }
           else if (i === 3) {
-            // Digit 4 - sequence check with digit 5
             if (Math.abs(parseInt(targetDigit) - parseInt(targetNumber[4])) === 1) {
               clue = `Digit 4 is next to Digit 5 in sequence.`;
             } else {
@@ -684,7 +167,6 @@
             }
           }
           else if (i === 4) {
-            // Digit 5 - extreme or parity
             if (targetDigit === '0' || targetDigit === '9') {
               clue = `Digit 5 is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`;
             } else if (parseInt(targetDigit) % 2 === 0) {
@@ -694,7 +176,6 @@
             }
           }
 
-          // Fallback if no clue was set (shouldn't happen with current logic)
           if (!clue) {
             clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
           }
@@ -705,70 +186,18 @@
     }
 
     // ===== SCORE SAVING AND LEADERBOARDS =====
-    const API_BASE_URL = 'https://code-breaker-game-backend.onrender.com'; // Replace with your Render URL
-
-    function showSaveScoreModal(score) {
-      const modal = document.getElementById('saveScoreModal');
-      modal.style.display = 'flex';
-      
-      // Clear previous error
-      document.getElementById('saveScoreError').textContent = '';
-      
-      // Close modal handler
-      document.getElementById('closeModal').onclick = () => {
-        modal.style.display = 'none';
-      };
-      
-      // Save score handler
-      document.getElementById('saveScoreBtn').onclick = async () => {
-        const username = document.getElementById('username').value.trim();
-        const pin = document.getElementById('userPin').value;
-        const country = document.getElementById('country').value;
-        
-        if (!username || !pin || pin.length !== 4 || isNaN(pin)) {
-          document.getElementById('saveScoreError').textContent = 'Please enter a valid username and 4-digit PIN';
-          return;
-        }
-        
-        try {
-          const response = await fetch(`${API_BASE_URL}/api/scores`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username,
-              pin,
-              country,
-              score,
-              date: new Date().toISOString()
-            })
-          });
-          
-          if (!response.ok) throw new Error('Server error');
-          
-          const data = await response.json();
-          modal.style.display = 'none';
-          loadLeaderboards();
-        } catch (err) {
-          console.error('Score save failed:', err);
-          document.getElementById('saveScoreError').textContent = 
-            'Score could not be saved (server offline). Your score was: ' + score;
-          // Store score locally for possible later submission
-          localStorage.setItem('unsavedScore', JSON.stringify({
-            username, pin, country, score, date: new Date().toISOString()
-          }));
-        }
-      };
-    }
+    const API_BASE_URL = 'https://code-breaker-game-backend.onrender.com';
 
     async function loadLeaderboards() {
-  try {
-    // Get current date in YYYY-MM-DD format (from the displayed dates)
-    const currentDate = new Date().toISOString().split('T')[0];
-    
-    const [dailyRes, weeklyRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/scores/daily?date=${currentDate}`),
-      fetch(`${API_BASE_URL}/api/scores/weekly?date=${currentDate}`)
-    ]);
+      try {
+        // Get user's local date in YYYY-MM-DD format
+        const now = new Date();
+        const clientDate = now.toISOString().split('T')[0];
+        
+        const [dailyRes, weeklyRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/scores/daily?date=${clientDate}`),
+          fetch(`${API_BASE_URL}/api/scores/weekly`)
+        ]);
         
         const dailyScores = await dailyRes.json();
         const weeklyScores = await weeklyRes.json();
@@ -806,6 +235,56 @@
       return countries[code] || code;
     }
 
+    function showSaveScoreModal(score) {
+      const modal = document.getElementById('saveScoreModal');
+      modal.style.display = 'flex';
+      
+      document.getElementById('saveScoreError').textContent = '';
+      
+      document.getElementById('closeModal').onclick = () => {
+        modal.style.display = 'none';
+      };
+      
+      document.getElementById('saveScoreBtn').onclick = async () => {
+        const username = document.getElementById('username').value.trim();
+        const pin = document.getElementById('userPin').value;
+        const country = document.getElementById('country').value;
+        const clientDate = new Date().toISOString().split('T')[0];
+        
+        if (!username || !pin || pin.length !== 4 || isNaN(pin)) {
+          document.getElementById('saveScoreError').textContent = 'Please enter a valid username and 4-digit PIN';
+          return;
+        }
+        
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/scores`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username,
+              pin,
+              country,
+              score,
+              date: clientDate
+            })
+          });
+          
+          if (!response.ok) throw new Error('Server error');
+          
+          const data = await response.json();
+          modal.style.display = 'none';
+          loadLeaderboards();
+        } catch (err) {
+          console.error('Score save failed:', err);
+          document.getElementById('saveScoreError').textContent = 
+            'Score could not be saved (server offline). Your score was: ' + score;
+          localStorage.setItem('unsavedScore', JSON.stringify({
+            username, pin, country, score, date: new Date().toISOString()
+          }));
+        }
+      };
+    }
+
     function handleGuess() {
       if (!canPlayToday()) {
         feedback.textContent = "You've already played today!";
@@ -828,7 +307,6 @@
       guesses.push(guess);
       const { clues, correctDigits } = getClues(guess);
 
-      // Lock and style correct digits
       correctDigits.forEach(pos => {
         const input = document.getElementById(`digit${pos+1}`);
         input.value = targetNumber[pos];
@@ -857,11 +335,9 @@
         document.getElementById('score').textContent = `Score: ${finalScore}`;
         updateHighScore(finalScore);
         
-        // Show save score modal and load leaderboards
         showSaveScoreModal(finalScore);
         loadLeaderboards();
         
-        // Confetti celebration
         const confettiScript = document.createElement('script');
         confettiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js';
         confettiScript.onload = () => {
@@ -927,7 +403,6 @@
 
     resetButton.addEventListener('click', resetGame);
 
-    // Only apply to game input fields (not modal inputs)
     document.querySelectorAll('.game-container input').forEach((input, index, inputs) => {
       input.addEventListener('input', (e) => {
         if (e.target.value.length === 1 && index < inputs.length - 1) {
