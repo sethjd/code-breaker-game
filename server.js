@@ -54,9 +54,11 @@ app.post('/api/scores', async (req, res) => {
 
 app.get('/api/scores/daily', async (req, res) => {
   try {
+    // Get the start of today (midnight) and start of tomorrow
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE date::date = CURRENT_DATE
+       WHERE date >= date_trunc('day', CURRENT_DATE) 
+         AND date < date_trunc('day', CURRENT_DATE) + INTERVAL '1 day'
        ORDER BY score DESC 
        LIMIT 10`
     );
@@ -66,7 +68,6 @@ app.get('/api/scores/daily', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch scores' });
   }
 });
-
 app.get('/api/scores/weekly', async (req, res) => {
   try {
     const result = await pool.query(
