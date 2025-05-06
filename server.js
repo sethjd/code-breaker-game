@@ -53,23 +53,28 @@ app.post('/api/scores', async (req, res) => {
 });
 
 app.get('/api/scores/daily', async (req, res) => {
-  const { date } = req.query; // Expecting YYYY-MM-DD format
-  
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ error: 'Invalid date format' });
-  }
-
   try {
+    // Debug: Check what the database thinks is "today"
+    const dateCheck = await pool.query('SELECT CURRENT_DATE as today, NOW() as now');
+    console.log('Database current date:', dateCheck.rows[0].today);
+    console.log('Database current time:', dateCheck.rows[0].now);
+
+    // Get scores from exactly today (midnight to midnight)
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE date::date = $1::date
+       WHERE date >= date_trunc('day', NOW()) 
+         AND date < date_trunc('day', NOW() + INTERVAL '1 day')
        ORDER BY score DESC 
-       LIMIT 10`,
-      [date]
+       LIMIT 10`
     );
+
+    // Debug: Check what dates were actually returned
+    console.log('Returned scores with dates:',
+      result.rows.map(r => `${r.username}: ${r.score} ${r.date.toISOString()}`));
+
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Daily scores error:', err);
     res.status(500).json({ error: 'Failed to fetch scores' });
   }
 });
