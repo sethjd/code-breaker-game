@@ -761,11 +761,14 @@
     }
 
     async function loadLeaderboards() {
-      try {
-        const [dailyRes, weeklyRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/scores/daily`),
-          fetch(`${API_BASE_URL}/api/scores/weekly`)
-        ]);
+  try {
+    // Get current date in YYYY-MM-DD format (from the displayed dates)
+    const currentDate = new Date().toISOString().split('T')[0];
+    
+    const [dailyRes, weeklyRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/scores/daily?date=${currentDate}`),
+      fetch(`${API_BASE_URL}/api/scores/weekly?date=${currentDate}`)
+    ]);
         
         const dailyScores = await dailyRes.json();
         const weeklyScores = await weeklyRes.json();
