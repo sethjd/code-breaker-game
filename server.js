@@ -53,14 +53,19 @@ app.post('/api/scores', async (req, res) => {
 });
 
 app.get('/api/scores/daily', async (req, res) => {
+  const { date } = req.query; // Expecting YYYY-MM-DD format
+  
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: 'Invalid date format' });
+  }
+
   try {
-    // Get the start of today (midnight) and start of tomorrow
     const result = await pool.query(
       `SELECT * FROM scores 
-       WHERE date >= date_trunc('day', CURRENT_DATE) 
-         AND date < date_trunc('day', CURRENT_DATE) + INTERVAL '1 day'
+       WHERE date::date = $1::date
        ORDER BY score DESC 
-       LIMIT 10`
+       LIMIT 10`,
+      [date]
     );
     res.json(result.rows);
   } catch (err) {
