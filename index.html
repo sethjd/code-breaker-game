@@ -634,75 +634,81 @@
 
     // ===== GAME FUNCTIONS =====
     function getClues(guess) {
-      const clues = [];
-      const correctDigits = [];
+  const clues = [];
+  const correctDigits = [];
+  // Track which hint types we've used in this round to avoid repetition
+  const usedHintTypes = [];
+  
+  for (let i = 0; i < 5; i++) {
+    let clue = '';
+    const digit = guess[i];
+    const targetDigit = targetNumber[i];
+    const clueElement = document.getElementById(`clue${i+1}`);
+
+    clueElement.classList.remove('clue-correct', 'clue-hint');
+
+    if (digit === targetDigit) {
+      correctDigits.push(i);
+      clue = `Digit ${i + 1} is correct!`;
+      clueElement.classList.add('clue-correct');
+    } else {
+      clueElement.classList.add('clue-hint');
+      const targetNum = parseInt(targetDigit);
+      const guessedNum = parseInt(digit);
       
-      for (let i = 0; i < 5; i++) {
-        let clue = '';
-        const digit = guess[i];
-        const targetDigit = targetNumber[i];
-        const clueElement = document.getElementById(`clue${i+1}`);
-
-        clueElement.classList.remove('clue-correct', 'clue-hint');
-
-        if (digit === targetDigit) {
-          correctDigits.push(i);
-          clue = `Digit ${i + 1} is correct!`;
-          clueElement.classList.add('clue-correct');
-        } else {
-          clueElement.classList.add('clue-hint');
-          
-          if (i === 0) {
-            // Digit 1 - prime number check
-            if ([2, 3, 5, 7].includes(parseInt(targetDigit))) {
-              clue = `Digit 1 is prime.`;
-            } else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          } 
-          else if (i === 1) {
-            // Digit 2 - divisible by 3 or even/odd
-            if (parseInt(targetDigit) % 3 === 0) {
-              clue = `Digit 2 is divisible by 3.`;
-            } 
-            else if (parseInt(targetDigit) % 2 === 0) {
-              clue = `Digit 2 is even.`;
-            } else {
-              clue = `Digit 2 is odd.`;
-            }
-          }
-          else if (i === 2) {
-            // Digit 3 - high/low
-            clue = `The target is ${parseInt(targetDigit) > 4 ? 'high (5-9)' : 'low (0-4)'}.`;
-          }
-          else if (i === 3) {
-            // Digit 4 - sequence check with digit 5
-            if (Math.abs(parseInt(targetDigit) - parseInt(targetNumber[4])) === 1) {
-              clue = `Digit 4 is next to Digit 5 in sequence.`;
-            } else {
-              clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-            }
-          }
-          else if (i === 4) {
-            // Digit 5 - extreme or parity
-            if (targetDigit === '0' || targetDigit === '9') {
-              clue = `Digit 5 is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`;
-            } else if (parseInt(targetDigit) % 2 === 0) {
-              clue = `Digit 5 is even.`;
-            } else {
-              clue = `Digit 5 is odd.`;
-            }
-          }
-
-          // Fallback if no clue was set (shouldn't happen with current logic)
-          if (!clue) {
-            clue = `The target is ${digit < targetDigit ? 'larger' : 'smaller'} than ${digit}.`;
-          }
-        }
-        clues.push(clue);
+      // Available hint types for this digit
+      const possibleHints = [];
+      
+      // 1. Prime number check
+      if ([2, 3, 5, 7].includes(targetNum)) {
+        possibleHints.push(`Digit ${i+1} is prime.`);
       }
-      return { clues, correctDigits };
+      
+      // 2. Divisibility by 3
+      if (targetNum % 3 === 0) {
+        possibleHints.push(`Digit ${i+1} is divisible by 3.`);
+      }
+      
+      // 3. Even/odd
+      possibleHints.push(`Digit ${i+1} is ${targetNum % 2 === 0 ? 'even' : 'odd'}.`);
+      
+      // 4. Extreme value
+      if (targetDigit === '0' || targetDigit === '9') {
+        possibleHints.push(`Digit ${i+1} is at the ${targetDigit === '0' ? 'low' : 'high'} extreme.`);
+      }
+      
+      // 5. High/low range
+      possibleHints.push(`Digit ${i+1} is ${targetNum > 4 ? 'high (5-9)' : 'low (0-4)'}.`);
+      
+      // 6. Higher/lower comparison
+      possibleHints.push(`Digit ${i+1} should be ${guessedNum < targetNum ? 'higher' : 'lower'}.`);
+      
+      // 7. Sequential with adjacent digits
+      if (i < 4 && Math.abs(targetNum - parseInt(targetNumber[i+1])) === 1) {
+        possibleHints.push(`Digit ${i+1} is next to digit ${i+2} in sequence.`);
+      }
+      if (i > 0 && Math.abs(targetNum - parseInt(targetNumber[i-1])) === 1) {
+        possibleHints.push(`Digit ${i+1} is next to digit ${i} in sequence.`);
+      }
+      
+      // Try to select a hint type we haven't used yet in this round
+      let selectedHint = '';
+      for (const hint of possibleHints) {
+        const hintType = hint.split(' ')[2]; // Get the unique part of the hint
+        if (!usedHintTypes.includes(hintType)) {
+          selectedHint = hint;
+          usedHintTypes.push(hintType);
+          break;
+        }
+      }
+      
+      // If all hint types are used, just pick one randomly
+      clue = selectedHint || possibleHints[Math.floor(Math.random() * possibleHints.length)];
     }
+    clues.push(clue);
+  }
+  return { clues, correctDigits };
+}
 
     // ===== SCORE SAVING AND LEADERBOARDS =====
     const API_BASE_URL = 'https://code-breaker-game-backend.onrender.com'; // Replace with your Render URL
